@@ -25,7 +25,7 @@ class WordCounter
         $wordsAndNumbers = preg_split('/\s+/', $text);
             
         // Initialize an empty array to store word and number frequencies
-        $counts = array();
+        $counts = [];
             
         // Iterate through each word/number and count its frequency
         foreach ($wordsAndNumbers as $item) {
