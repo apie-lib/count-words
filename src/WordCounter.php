@@ -15,6 +15,7 @@ class WordCounter
      */
     public static function countFromString(string $text): array
     {
+        $originalText = mb_strtolower(trim($text));
         // Convert the text to lowercase to make counting case-insensitive
         $text = mb_strtolower($text);
             
@@ -40,6 +41,10 @@ class WordCounter
             } else {
                 $counts[$item] = 1;
             }
+        }
+
+        if (empty($counts) && !empty($originalText)) {
+            $counts[$originalText] = 1;
         }
             
         return $counts;

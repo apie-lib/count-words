@@ -47,6 +47,12 @@ class WordCounterTest extends TestCase
                     "456" => 1
                 ]
             ],
+            'single non-alphanumeric character' => [
+                '%',
+                [
+                    '%' => 1,
+                ]
+            ],
             'contains foreign characters' => [
                 "This is a 你好 sample text. 123 3.14 你好 456 This text contains 你好 sample words.",
                 [
