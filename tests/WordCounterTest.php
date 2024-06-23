@@ -15,6 +15,19 @@ class WordCounterTest extends TestCase
         
         $this->assertEquals($expectedCounts, $counts);
     }
+
+    /**
+     * @dataProvider textDataProvider
+     */
+    public function testCountFromResource(string $text, array $expectedCounts)
+    {
+        $resource = fopen('php://temp', 'r+');
+        fwrite($resource, $text);
+        rewind($resource);
+        $counts = WordCounter::countFromResource($resource);
+        
+        $this->assertEquals($expectedCounts, $counts);
+    }
     
     public function textDataProvider()
     {
