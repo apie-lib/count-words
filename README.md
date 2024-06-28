@@ -47,3 +47,10 @@ array(10) {
   int(1)
 }
 ```
+It also supports reading (large) files as long the indexing does still fit in memory:
+
+```php
+use Apie\CountWords\WordCounter;
+
+var_dump(WordCounter::countFromResource(fopen('large_file.txt', 'r')));
+```
