@@ -1,6 +1,8 @@
 <?php
 namespace Apie\CountWords;
 
+use ZipArchive;
+
 class WordCounter
 {
     /**
@@ -23,7 +25,7 @@ class WordCounter
         $text = preg_replace('/[^\p{L}\p{N}\s.]/u', '', $text);
         
         // Split the text into an array of words and numbers
-        $wordsAndNumbers = preg_split('/\s+/', $text);
+        $wordsAndNumbers = preg_split('/[\s<>]+/', $text);
             
         // Initialize an empty array to store word and number frequencies
         $counts = [];
@@ -95,7 +97,7 @@ class WordCounter
     {
         $chunk = mb_strtolower($originalText);
         $chunk = preg_replace('/[^\p{L}\p{N}\s.]/u', '', $chunk);
-        $wordsAndNumbers = preg_split('/\s+/', $chunk);
+        $wordsAndNumbers = preg_split('/[\s<>]+/', $chunk);
 
         foreach ($wordsAndNumbers as $item) {
             $item = rtrim($item, '.');
@@ -114,6 +116,37 @@ class WordCounter
             $counts[$originalText] = 1;
         }
 
+        return $counts;
+    }
+
+    /**
+     * @return array<string, int>
+     */
+    public static function countFromOfficeXMLDocument(string $filePath): array
+    {
+        $counts = [];
+        $zip = new ZipArchive();
+        if (!$zip->open($filePath)) {
+            throw new \RuntimeException('Could not open ' . $filePath);
+        }
+        for ($i = 0; $i < $zip->numFiles; $i++) {
+            $fileName = $zip->getNameIndex($i);
+            if (!preg_match('/\.xml$/i', $fileName)) {
+                continue;
+            }
+        
+            // Open a stream to read the file content
+            $stream = $zip->getStream($fileName);
+        
+            if (!$stream) {
+                throw new \LogicException("Failed to open stream for file: $fileName\n");
+            }
+            $fileCounts = self::countFromString(strip_tags(str_replace(['<', '>'], [' <', '>  '], stream_get_contents($stream))));
+            foreach ($fileCounts as $word => $count) {
+                $counts[$word] = $count + ($counts[$word] ?? 0);
+            }
+            fclose($stream);
+        }
         return $counts;
     }
 }
