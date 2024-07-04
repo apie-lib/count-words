@@ -1,41 +1,74 @@
 <?php
 namespace Apie\CountWords;
 
-use ZipArchive;
+use Apie\CountWords\Strategies\HtmlWordCounter;
+use Apie\CountWords\Strategies\JsonWordCounter;
+use Apie\CountWords\Strategies\OfficeDocumentWordCounter;
+use Apie\CountWords\Strategies\PdfFileWordCounter;
+use Apie\CountWords\Strategies\PlaintextWordCounter;
+use Apie\CountWords\Strategies\XmlWordCounter;
+use Apie\CountWords\Strategies\ZipArchiveWordCounter;
 
 class WordCounter
 {
+    private const FILE_STRATEGIES = [
+        JsonWordCounter::class,
+        OfficeDocumentWordCounter::class,
+        PdfFileWordCounter::class,
+        HtmlWordCounter::class,
+        XmlWordCounter::class,
+        PlaintextWordCounter::class,
+        ZipArchiveWordCounter::class,
+    ];
+
     /**
      * @codeCoverageIgnore
      */
     private function __construct()
     {
     }
-    
+
     /**
+     * @param array<string, int> $counts
      * @return array<string, int>
      */
-    public static function countFromString(string $text): array
+    public static function countFromFile(string $path, array $counts = [], ?string $mimeType = null): array
+    {
+        $extension = pathinfo($path, PATHINFO_EXTENSION);
+        foreach (self::FILE_STRATEGIES as $fileStrategyClass) {
+            if ($fileStrategyClass::isSupported($extension, $mimeType)) {
+                return $fileStrategyClass::countFromFile($path, $counts);
+            }
+        }
+        return $counts;
+    }
+    
+    /**
+     * @param array<string, int> $counts
+     * @return array<string, int>
+     */
+    public static function countFromString(string $text, array $counts = [], ?string $mimeType = null, ?string $extension = null): array
     {
         $originalText = mb_strtolower(trim($text));
-        // Convert the text to lowercase to make counting case-insensitive
         $text = mb_strtolower($text);
-            
-        // Remove punctuation marks and symbols
         $text = preg_replace('/[^\p{L}\p{N}\s.]/u', '', $text);
-        
-        // Split the text into an array of words and numbers
-        $wordsAndNumbers = preg_split('/[\s<>]+/', $text);
-            
-        // Initialize an empty array to store word and number frequencies
-        $counts = [];
+        $wordsAndNumbers = preg_split('/[\s]+/', $text);
+
+        foreach (self::FILE_STRATEGIES as $fileStrategyClass) {
+            if ($fileStrategyClass::isSupported($extension, $mimeType)) {
+                return $fileStrategyClass::countFromString($text, $counts);
+            }
+        }
+        if ($mimeType !== null || $extension !== null) {
+            return $counts;
+        }
             
         // Iterate through each word/number and count its frequency
         foreach ($wordsAndNumbers as $item) {
             // we could not remove '.' beforehand all the time as a floating point would lose the '.' as well.
             $item = rtrim($item, '.');
             if (empty($item)) {
-                continue; // Skip empty strings
+                continue;
             }
                 
             if (array_key_exists($item, $counts)) {
@@ -54,29 +87,33 @@ class WordCounter
 
     /**
      * @param resource $resource
+     * @param array<string, int> $counts
      * @return array<string, int>
      */
-    public static function countFromResource($resource): array
+    public static function countFromResource($resource, array $counts = [], ?string $mimeType = null, ?string $extension = null): array
     {
         if (!is_resource($resource)) {
             throw new \InvalidArgumentException('The provided argument is not a valid resource.');
         }
-
-        /** @var array<string, int> $counts */
-        $counts = [];
+        foreach (self::FILE_STRATEGIES as $fileStrategyClass) {
+            if ($fileStrategyClass::isSupported($extension, $mimeType)) {
+                return $fileStrategyClass::countFromResource($resource, $counts);
+            }
+        }
+        if ($mimeType !== null || $extension !== null) {
+            return $counts;
+        }
         $buffer = '';
         $chunkSize = 4096; // Read 4KB at a time
 
         while (!feof($resource)) {
             $buffer .= fread($resource, $chunkSize);
             
-            // Process whole words from the buffer
             $lastSpacePos = strrpos($buffer, ' ');
             if ($lastSpacePos !== false) {
                 $chunk = substr($buffer, 0, $lastSpacePos);
                 $buffer = substr($buffer, $lastSpacePos + 1);
 
-                // Update word counts
                 $counts = self::updateCountsFromChunk($chunk, $counts);
             }
         }
@@ -97,7 +134,7 @@ class WordCounter
     {
         $chunk = mb_strtolower($originalText);
         $chunk = preg_replace('/[^\p{L}\p{N}\s.]/u', '', $chunk);
-        $wordsAndNumbers = preg_split('/[\s<>]+/', $chunk);
+        $wordsAndNumbers = preg_split('/[\s]+/', $chunk);
 
         foreach ($wordsAndNumbers as $item) {
             $item = rtrim($item, '.');
@@ -116,37 +153,6 @@ class WordCounter
             $counts[$originalText] = 1;
         }
 
-        return $counts;
-    }
-
-    /**
-     * @return array<string, int>
-     */
-    public static function countFromOfficeXMLDocument(string $filePath): array
-    {
-        $counts = [];
-        $zip = new ZipArchive();
-        if (!$zip->open($filePath)) {
-            throw new \RuntimeException('Could not open ' . $filePath);
-        }
-        for ($i = 0; $i < $zip->numFiles; $i++) {
-            $fileName = $zip->getNameIndex($i);
-            if (!preg_match('/\.xml$/i', $fileName)) {
-                continue;
-            }
-        
-            // Open a stream to read the file content
-            $stream = $zip->getStream($fileName);
-        
-            if (!$stream) {
-                throw new \LogicException("Failed to open stream for file: $fileName\n");
-            }
-            $fileCounts = self::countFromString(strip_tags(str_replace(['<', '>'], [' <', '>  '], stream_get_contents($stream))));
-            foreach ($fileCounts as $word => $count) {
-                $counts[$word] = $count + ($counts[$word] ?? 0);
-            }
-            fclose($stream);
-        }
         return $counts;
     }
 }
