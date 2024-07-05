@@ -28,7 +28,7 @@ final class PdfFileWordCounter implements WordCounterInterface
     public static function countFromFile(string $path, array $counts = []): array
     {
         $parser = new Parser();
-        try {   
+        try {
             $pdf = $parser->parseFile($path);
             $text = $pdf->getText();
         } catch (\Exception) {
