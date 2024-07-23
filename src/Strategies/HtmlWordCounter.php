@@ -58,7 +58,7 @@ final class HtmlWordCounter implements WordCounterInterface
 
     public static function isSupported(?string $fileExtension, ?string $mimeType): bool
     {
-        return in_array($fileExtension, ['html', 'xhtml', 'htm']) || in_array($mimeType, ['text/html', 'application/xhtml+xml']);
+        return in_array($fileExtension, ['html', 'xhtml', 'htm', 'svg']) || in_array($mimeType, ['text/html', 'application/xhtml+xml', 'image/svg+xml']);
     }
 
     /**
