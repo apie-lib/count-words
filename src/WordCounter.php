@@ -105,7 +105,7 @@ class WordCounter
         }
         $buffer = '';
         $chunkSize = 4096; // Read 4KB at a time
-
+        rewind($resource);
         while (!feof($resource)) {
             $buffer .= fread($resource, $chunkSize);
             
