@@ -79,6 +79,7 @@ class WordCounter
         }
 
         if (empty($counts) && !empty($originalText)) {
+            $originalText = preg_replace('/[^\P{C}]+/u', '', $originalText);
             $counts[$originalText] = 1;
         }
             
@@ -104,7 +105,7 @@ class WordCounter
             return $counts;
         }
         $buffer = '';
-        $chunkSize = 4096; // Read 4KB at a time
+        $chunkSize = 4096 * 1024; // Read 4MB at a time
         rewind($resource);
         while (!feof($resource)) {
             $buffer .= fread($resource, $chunkSize);
@@ -113,13 +114,18 @@ class WordCounter
             if ($lastSpacePos !== false) {
                 $chunk = substr($buffer, 0, $lastSpacePos);
                 $buffer = substr($buffer, $lastSpacePos + 1);
-
+                if (preg_match('/[^\P{C}]+/u', $chunk)) {
+                    return $counts;
+                }
                 $counts = self::updateCountsFromChunk($chunk, $counts);
             }
         }
 
         // Process any remaining words in the buffer
         if (!empty($buffer)) {
+            if (preg_match('/[^\P{C}]+/u', $buffer)) {
+                return $counts;
+            }
             $counts = self::updateCountsFromChunk($buffer, $counts);
         }
 
@@ -150,6 +156,7 @@ class WordCounter
         }
 
         if (empty($counts) && !empty($originalText)) {
+            $originalText = preg_replace('/[^\P{C}]+/u', '', $originalText);
             $counts[$originalText] = 1;
         }
 
