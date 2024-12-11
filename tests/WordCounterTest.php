@@ -7,6 +7,36 @@ use PHPUnit\Framework\TestCase;
 class WordCounterTest extends TestCase
 {
     /**
+     * @dataProvider fileDataProvider
+     */
+    public function testCountFromFile(string $file, array $expectedCounts)
+    {
+        $counts = WordCounter::countFromFile($file);
+        
+        $this->assertEquals($expectedCounts, $counts);
+    }
+
+    public function fileDataProvider()
+    {
+        $path = __DIR__ . '/../fixtures/';
+        yield 'html file' => [$path . '/html/test.html', json_decode(file_get_contents($path . 'expected-html-sample.json'), true)];
+        yield 'text file' => [
+            $path . '/txt/example.txt',
+            [
+                'this' => 1,
+                'is' => 1,
+                'an' => 1,
+                'example' => 1,
+                'of' => 1,
+                'a' => 1,
+                'plaintext' => 1,
+                'file' => 1,
+            ]
+        ];
+        yield 'unknown binary format' => [$path . 'unknown-binary-format.bin', []];
+    }
+    
+    /**
      * @dataProvider textDataProvider
      */
     public function testCountFromString(string $text, array $expectedCounts)
