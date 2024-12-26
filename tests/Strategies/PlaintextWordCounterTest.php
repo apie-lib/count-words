@@ -6,9 +6,7 @@ use PHPUnit\Framework\TestCase;
 
 class PlaintextWordCounterTest extends TestCase
 {
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function it_can_count_words_in_text_files()
     {
         $txtPath = __DIR__ . '/../../fixtures/txt/example.txt';

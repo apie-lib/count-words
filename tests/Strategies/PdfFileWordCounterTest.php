@@ -6,9 +6,7 @@ use PHPUnit\Framework\TestCase;
 
 class PdfFileWordCounterTest extends TestCase
 {
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function it_can_count_words_in_pdf_files()
     {
         $pdfPath = __DIR__ . '/../../fixtures/pdf/sample.pdf';

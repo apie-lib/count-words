@@ -6,9 +6,7 @@ use PHPUnit\Framework\TestCase;
 
 class HtmlWordCounterTest extends TestCase
 {
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function it_can_count_words_in_html_files()
     {
         $htmlPath = __DIR__ . '/../../fixtures/html/test.html';

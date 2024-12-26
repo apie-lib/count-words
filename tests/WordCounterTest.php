@@ -6,9 +6,7 @@ use PHPUnit\Framework\TestCase;
 
 class WordCounterTest extends TestCase
 {
-    /**
-     * @dataProvider fileDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('fileDataProvider')]
     public function testCountFromFile(string $file, array $expectedCounts)
     {
         $counts = WordCounter::countFromFile($file);
@@ -16,7 +14,7 @@ class WordCounterTest extends TestCase
         $this->assertEquals($expectedCounts, $counts);
     }
 
-    public function fileDataProvider()
+    public static function fileDataProvider()
     {
         $path = __DIR__ . '/../fixtures/';
         yield 'html file' => [$path . '/html/test.html', json_decode(file_get_contents($path . 'expected-html-sample.json'), true)];
@@ -36,9 +34,7 @@ class WordCounterTest extends TestCase
         yield 'unknown binary format' => [$path . 'unknown-binary-format.bin', []];
     }
     
-    /**
-     * @dataProvider textDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('textDataProvider')]
     public function testCountFromString(string $text, array $expectedCounts)
     {
         $counts = WordCounter::countFromString($text);
@@ -46,9 +42,7 @@ class WordCounterTest extends TestCase
         $this->assertEquals($expectedCounts, $counts);
     }
 
-    /**
-     * @dataProvider textDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('textDataProvider')]
     public function testCountFromResource(string $text, array $expectedCounts)
     {
         $resource = fopen('php://temp', 'r+');
@@ -59,7 +53,7 @@ class WordCounterTest extends TestCase
         $this->assertEquals($expectedCounts, $counts);
     }
     
-    public function textDataProvider()
+    public static function textDataProvider()
     {
         return [
             'simple test 1' => [

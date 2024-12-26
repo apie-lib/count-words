@@ -6,9 +6,7 @@ use PHPUnit\Framework\TestCase;
 
 class XmlWordCounterTest extends TestCase
 {
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function it_can_count_words_in_xml_files()
     {
         $xmlPath = __DIR__ . '/../../fixtures/xml/test.xml';

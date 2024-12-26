@@ -6,9 +6,7 @@ use PHPUnit\Framework\TestCase;
 
 class JsonWordCounterTest extends TestCase
 {
-    /**
-     * @test
-     */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function it_can_count_words_in_json_files()
     {
         $jsonPath = __DIR__ . '/../../fixtures/json/example.json';
