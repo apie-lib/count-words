@@ -1,0 +1,19 @@
+{
+    "null-value": null,
+    "string-value": "Lorem ipsum",
+    "integer-value": 42,
+    "floating-point": 1.5,
+    "sub-object": {
+        "a": 1,
+        "b": "This is a test",
+        "c": {
+            "0": "1",
+            "1": "2",
+            "": "5"
+        }
+    },
+    "list": [
+        "item 1",
+        "item 2"
+    ]
+}

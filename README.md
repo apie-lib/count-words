@@ -6,7 +6,7 @@
 
 
 
- [![Latest Stable Version](http://poser.pugx.org/apie/count-words/v)](https://packagist.org/packages/apie/count-words) [![Total Downloads](http://poser.pugx.org/apie/count-words/downloads)](https://packagist.org/packages/apie/count-words) [![Latest Unstable Version](http://poser.pugx.org/apie/count-words/v/unstable)](https://packagist.org/packages/apie/count-words) [![License](http://poser.pugx.org/apie/count-words/license)](https://packagist.org/packages/apie/count-words) [![PHP Version Require](http://poser.pugx.org/apie/count-words/require/php)](https://packagist.org/packages/apie/count-words) [![Code coverage](https://raw.githubusercontent.com/apie-lib/count-words/main/coverage_badge.svg)](https://apie-lib.github.io/coverage/count-words/index.html)  
+ [![Latest Stable Version](https://poser.pugx.org/apie/count-words/v)](https://packagist.org/packages/apie/count-words) [![Total Downloads](https://poser.pugx.org/apie/count-words/downloads)](https://packagist.org/packages/apie/count-words) [![Latest Unstable Version](https://poser.pugx.org/apie/count-words/v/unstable)](https://packagist.org/packages/apie/count-words) [![License](https://poser.pugx.org/apie/count-words/license)](https://packagist.org/packages/apie/count-words) [![PHP Composer](https://apie-lib.github.io/projectCoverage/coverage-count-words.svg)](https://apie-lib.github.io/projectCoverage/count-words/index.html)  
 
 [![PHP Composer](https://github.com/apie-lib/count-words/actions/workflows/php.yml/badge.svg?event=push)](https://github.com/apie-lib/count-words/actions/workflows/php.yml)
 
@@ -46,4 +46,11 @@ array(10) {
   ["and"]=>
   int(1)
 }
+```
+It also supports reading (large) files as long the indexing does still fit in memory:
+
+```php
+use Apie\CountWords\WordCounter;
+
+var_dump(WordCounter::countFromResource(fopen('large_file.txt', 'r')));
 ```
