@@ -16,7 +16,12 @@ The code is maintained in a monorepo, so PR's need to be sent to the [monorepo](
 ## Documentation
 This small package contains a class to count words in a text. All words are returned lowercase.
 
-Usage
+### Standalone usage
+Install it with:
+```bash
+composer require apie/count-words
+```
+
 ```php
 use Apie\CountWords\WordCounter;
 
